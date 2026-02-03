@@ -47,6 +47,7 @@ public class DoppelgangerAI : MonoBehaviour
         if (rb) 
         {
             rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // Added for safety
             defaultGravityScale = rb.gravityScale;
         }
         if (!spriteRenderer) spriteRenderer = GetComponent<SpriteRenderer>();
@@ -178,7 +179,7 @@ public class DoppelgangerAI : MonoBehaviour
         Vector2 gravityDown = -transform.up; 
         if (Physics2D.gravity != Vector2.zero) gravityDown = Physics2D.gravity.normalized;
 
-        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, gravityDown, 1.0f, groundLayer);
+        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, gravityDown, 0.6f, groundLayer);
         
         if (hit)
         {
@@ -253,11 +254,25 @@ public class DoppelgangerAI : MonoBehaviour
             
             float slopeFactor = 1f;
             float horizontalComponent = Mathf.Abs(Vector2.Dot(slopeNormalPerp, playerRight));
-            if (horizontalComponent > 0.1f) slopeFactor = 1f / horizontalComponent;
+            
+            if (horizontalComponent > 0.01f) 
+            {
+                slopeFactor = 1f / horizontalComponent;
+            }
             slopeFactor = Mathf.Clamp(slopeFactor, 1f, 3f);
 
             Vector2 slopeVelocity = slopeNormalPerp * Mathf.Abs(newSpeedX) * slopeFactor;
-            rb.linearVelocity = slopeVelocity;
+
+            // SAFETY CHECK: Prevent sticking on vertical seams
+            if (Mathf.Abs(targetSpeedX) > 0.1f && Mathf.Abs(slopeVelocity.x) < 0.01f)
+            {
+                // Fallback to normal movement
+            }
+            else
+            {
+                rb.linearVelocity = slopeVelocity;
+                return; // Only return if successful slope move
+            }
         }
         else
         {

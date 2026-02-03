@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 8
-  jumpHeight: 2.5
+  jumpHeight: 5
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -131,6 +131,11 @@ MonoBehaviour:
   attackDelay: 0.1
   attackDuration: 0.3
   isGrounded: 0
+  maxSlopeAngle: 60
+  maxAcceleration: 35
+  maxAirAcceleration: 20
+  downwardMovementMultiplier: 3
+  upwardMovementMultiplier: 1.7
 --- !u!114 &5723939376419208061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -510,6 +515,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   dashCooldownImage: {fileID: 0}
   dashReadyEffect: {fileID: 0}
+  gameOverPanel: {fileID: 0}
   playerController: {fileID: 2486257073085163160}
 --- !u!1 &8764188905553986611
 GameObject:

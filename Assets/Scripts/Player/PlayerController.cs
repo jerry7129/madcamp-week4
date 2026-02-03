@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Settings")]
     public float moveSpeed = 8f;
-    public float jumpHeight = 2.5f; // Desired height in Units (v = sqrt(2gh))
+    public float jumpHeight = 5f; // Desired height in Units (v = sqrt(2gh))
     public LayerMask groundLayer;
     public Transform groundCheck;
 
@@ -67,6 +67,7 @@ public class PlayerController : MonoBehaviour
         if(rb) 
         {
             rb.sleepMode = RigidbodySleepMode2D.NeverSleep; 
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             defaultGravityScale = rb.gravityScale; 
         }
         animator = GetComponent<Animator>(); 
@@ -210,7 +211,7 @@ public class PlayerController : MonoBehaviour
                     cKeyHoldTime += Time.deltaTime;
                     
                     // Trigger "Charge Complete" visual once
-                    if (cKeyHoldTime >= 2.0f && !cKeyReadyFeedbackPlayed)
+                    if (cKeyHoldTime >= 1.0f && !cKeyReadyFeedbackPlayed)
                     {
                         cKeyReadyFeedbackPlayed = true;
                         StartCoroutine(PlayChargeCompleteEffect());
@@ -224,7 +225,7 @@ public class PlayerController : MonoBehaviour
                     // Key Released
                     if (cKeyWasPressed)
                     {
-                        if (cKeyHoldTime >= 2.0f)
+                        if (cKeyHoldTime >= 1.0f)
                         {
                             // Activate Sixfold Mode
                             sixfoldStacks = 6;
@@ -250,24 +251,28 @@ public class PlayerController : MonoBehaviour
             // Vertical input is ignored for walking in this setup
             moveInput = new Vector2(x, 0);
 
-            // 2. Thunderclap Input (Left Mouse Click)
-            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && canDash)
+            // 2. Thunderclap Input (Left Mouse Click) w/ BUFFERING
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             {
-                Camera cam = Camera.main;
-                if (cam == null) cam = FindFirstObjectByType<Camera>(); // Fallback
+                lastAttackInputTime = Time.time; // Buffer the input
+            }
 
-                if (cam != null)
-                {
-                    Vector3 mouseWorldPos = cam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-                    mouseWorldPos.z = transform.position.z; // Flatten Z
-                    Vector2 dashDir = (mouseWorldPos - transform.position).normalized;
+            // Execute Buffered Attack
+            if (Time.time - lastAttackInputTime < inputBufferWindow && canDash)
+            {
+               Camera cam = Camera.main;
+               if (cam == null) cam = FindFirstObjectByType<Camera>(); 
 
-                    StartCoroutine(ThunderclapAndFlash(dashDir));
-                }
-                else
-                {
-                    Debug.LogWarning("No Main Camera found! Cannot target Thunderclap.");
-                }
+               if (cam != null)
+               {
+                   lastAttackInputTime = -99f; // Consume buffer
+
+                   Vector3 mouseWorldPos = cam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+                   mouseWorldPos.z = transform.position.z; 
+                   Vector2 dashDir = (mouseWorldPos - transform.position).normalized;
+
+                   StartCoroutine(ThunderclapAndFlash(dashDir));
+               }
             }
 
             // 3. Normal Attack (Ctrl Key)
@@ -379,6 +384,10 @@ public class PlayerController : MonoBehaviour
     private Vector2 slopeNormalPerp;
     private bool isOnSlope;
     private float slopeLockoutTimer = 0f;
+    
+    // Input Buffer
+    private float lastAttackInputTime = -99f;
+    private const float inputBufferWindow = 0.2f;
 
     void CheckGrounded()
     {
@@ -405,8 +414,8 @@ public class PlayerController : MonoBehaviour
         Vector2 gravityDown = -transform.up; 
         if (Physics2D.gravity != Vector2.zero) gravityDown = Physics2D.gravity.normalized;
 
-        Debug.DrawRay(groundCheck.position, gravityDown * 1.0f, Color.blue); // Visualize Ray
-        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, gravityDown, 1.0f, groundLayer); // Increased distance to 1.0f
+        Debug.DrawRay(groundCheck.position, gravityDown * 0.6f, Color.blue); // Visualize Ray
+        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, gravityDown, 0.6f, groundLayer);
         
         if (hit)
         {
@@ -501,7 +510,8 @@ public class PlayerController : MonoBehaviour
         if (isOnSlope && slopeLockoutTimer <= 0)
         {
              // If we are effectively "stopped" (very low speed input and actual speed), snap to 0
-             if (Mathf.Abs(targetSpeedX) < 0.01f && Mathf.Abs(newSpeedX) < 0.01f)
+             // KEY FIX: Only stick if slope is steep enough (> 5 deg). Don't stick on flat tiles (0~tiny)
+             if (slopeAngle > 5f && Mathf.Abs(targetSpeedX) < 0.01f && Mathf.Abs(newSpeedX) < 0.01f)
              {
                  rb.linearVelocity = Vector2.zero;
                  rb.gravityScale = 0f; // Disable gravity to stick
@@ -526,7 +536,7 @@ public class PlayerController : MonoBehaviour
              // Check dot product with playerRight to get the horizontal component magnitude
              float horizontalComponent = Mathf.Abs(Vector2.Dot(slopeNormalPerp, playerRight));
              
-             if (horizontalComponent > 0.1f)
+             if (horizontalComponent > 0.01f) // Threshold slightly lowered for safety
              {
                  slopeFactor = 1f / horizontalComponent;
              }
@@ -537,11 +547,21 @@ public class PlayerController : MonoBehaviour
 
              // Apply Velocity aligned with Slope
              Vector2 slopeVelocity = slopeNormalPerp * Mathf.Abs(newSpeedX) * slopeFactor;
-             rb.linearVelocity = slopeVelocity;
-             
-             // Debug
-             Debug.DrawRay(transform.position, slopeVelocity, Color.green);
-             return;
+
+             // SAFETY CHECK: If we are trying to move, but slope math creates a vertical-only vector (Stuck on wall/seam)
+             // Fallback to normal movement to push through or slide off.
+             if (Mathf.Abs(targetSpeedX) > 0.1f && Mathf.Abs(slopeVelocity.x) < 0.01f)
+             {
+                 // Debug.Log("Slope Stuck Detected! Fallback to standard Physics.");
+                 // Fall through to Section 4 (Normal/Air Movement)
+             }
+             else
+             {
+                 rb.linearVelocity = slopeVelocity;
+                 // Debug
+                 Debug.DrawRay(transform.position, slopeVelocity, Color.green);
+                 return;
+             }
         }
 
         // 4. Normal / Air Movement
@@ -704,6 +724,23 @@ public class PlayerController : MonoBehaviour
         while (elapsedTime < dashDuration)
         {
             elapsedTime += Time.deltaTime;
+            
+            // PREDICTIVE COLLISION CHECK
+            // Cast a ray forward to see if we are about to hit a wall in this frame
+            float checkDist = (dashSpeed * Time.deltaTime) + 0.5f; 
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, dashDir, checkDist, groundLayer);
+
+            if (hit && !hit.collider.isTrigger)
+            {
+                // We are about to hit a wall! 
+                // Stop immediately to prevent tunneling/clipping.
+                rb.linearVelocity = Vector2.zero;
+                
+                // Optional: Snap to just in front of the wall
+                transform.position = hit.point - (dashDir * 0.4f); 
+                break; // Exit Dash Loop
+            }
+
             rb.linearVelocity = dashDir * dashSpeed; 
             yield return null;
         }
@@ -743,15 +780,23 @@ public class PlayerController : MonoBehaviour
             sixfoldExpireTimer = 1.0f; // Reset expire timer (extend chain window)
         }
 
-        // Manual Cooldown for UI
-        currentCooldownTimer = activeCooldown;
-        while (currentCooldownTimer > 0)
-        {
-            currentCooldownTimer -= Time.deltaTime;
-            yield return null;
-        }
+        // Manual Cooldown Logic - DELEGATE TO UPDATE
+        // Remove conflicting while-loop logic.
+        // Update() counts UP. Coroutine should just exit and let Update take over.
         
-        canDash = true;
+        if (sixfoldStacks > 0)
+        {
+            // Instant Reset for Sixfold
+            canDash = true;
+            currentCooldownTimer = 0f; // UI Ready
+        }
+        else
+        {
+            // Normal Mode: Maintain cooldown state
+            // Ensure timer starts at 0 so Update can count it UP to dashCooldown
+            currentCooldownTimer = 0f; 
+            // canDash remains false here. It will become true in Update() when timer >= limit.
+        }
     }
 
     private IEnumerator PlayChargeCompleteEffect()

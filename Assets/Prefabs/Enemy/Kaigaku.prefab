@@ -329,16 +329,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdd5ce609feb8604b9be01310268f693, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoppelgangerAI
-  moveSpeed: 4
+  moveSpeed: 6
   detectRange: 15
   attackRange: 1
   attackCooldown: 2
+  maxSlopeAngle: 60
+  maxAcceleration: 35
+  maxAirAcceleration: 20
+  downwardMovementMultiplier: 3
+  upwardMovementMultiplier: 1.7
+  jumpHeight: 3
   target: {fileID: 0}
   animator: {fileID: 0}
   rb: {fileID: 0}
   spriteRenderer: {fileID: 0}
   attackHitbox: {fileID: 4083553155093118867}
-  jumpHeight: 3
   groundCheck: {fileID: 6344436270314716674}
   groundLayer:
     serializedVersion: 2
