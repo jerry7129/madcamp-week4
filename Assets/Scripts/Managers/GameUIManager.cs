@@ -12,6 +12,9 @@ public class GameUIManager : MonoBehaviour
     public Image dashCooldownImage; // Filled Image type
     public GameObject dashReadyEffect; // Optional flashing outline
 
+    [Header("Game Over UI")]
+    public GameObject gameOverPanel; 
+
     [Header("References")]
     public PlayerController playerController;
 
@@ -26,7 +29,6 @@ public class GameUIManager : MonoBehaviour
                 playerController = playerObj.GetComponent<PlayerController>();
             }
             
-            // Fallback
             // Fallback
             if (playerController == null)
             {
@@ -43,6 +45,9 @@ public class GameUIManager : MonoBehaviour
         {
             healthSlider = GetComponentInChildren<Slider>();
         }
+
+        // Ensure Game Over UI is hidden on start (re-load)
+        if (gameOverPanel) gameOverPanel.SetActive(false);
     }
 
     void Update()
@@ -72,5 +77,41 @@ public class GameUIManager : MonoBehaviour
         
         if (dashReadyEffect)
             dashReadyEffect.SetActive(ratio >= 1f);
+    }
+
+    public void ShowGameOver()
+    {
+        if (gameOverPanel) 
+        {
+            gameOverPanel.SetActive(true);
+        }
+    }
+
+    public void RestartGame()
+    {
+        // Don't reload scene, just respawn player
+        if (playerController)
+        {
+            // Find Health component to trigger full respawn chain
+            var health = playerController.GetComponent<PlayerHealth>();
+            if (health)
+            {
+                health.Respawn();
+            }
+            else
+            {
+                // Fallback for controller only
+                playerController.Respawn();
+            }
+        }
+        else
+        {
+            // Fallback if controller missing: Reload Scene
+             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+             return;
+        }
+
+        // Hide UI
+        if(gameOverPanel) gameOverPanel.SetActive(false);
     }
 }

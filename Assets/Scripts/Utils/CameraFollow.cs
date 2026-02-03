@@ -23,19 +23,42 @@ public class CameraFollow : MonoBehaviour
                 if(zenitsu) target = zenitsu.transform;
             }
         }
+
+        // Snap rotation immediately on start
+        UpdateCameraRotation(true);
     }
 
     void LateUpdate()
     {
         if (target != null)
         {
-            // Goal Position (Target + Offset)
-            // We use World Position calculations. Even if camera rotates, 
-            // the offset (0,0,-10) in world space keeps it "in front" of the 2D plane.
+            // Position Follow
             Vector3 targetPosition = target.position + offset;
-            
-            // Smoothly move the camera to the target position
             transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+
+            // Rotation Follow (Gravity)
+            UpdateCameraRotation(false);
+        }
+    }
+
+    void UpdateCameraRotation(bool snap)
+    {
+        Vector2 g = Physics2D.gravity;
+        if (g == Vector2.zero) return; // No gravity means no specific up
+
+        Vector2 targetUp = -g.normalized;
+        float targetAngle = Mathf.Atan2(targetUp.y, targetUp.x) * Mathf.Rad2Deg - 90f;
+        Quaternion targetRotation = Quaternion.Euler(0, 0, targetAngle);
+
+        if (snap)
+        {
+            transform.rotation = targetRotation;
+        }
+        else
+        {
+            // Rotate camera smoothly to match gravity/player orientation
+            // Use slightly slower speed than player for smoother feel
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 5f * Time.deltaTime);
         }
     }
 }

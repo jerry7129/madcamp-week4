@@ -73,16 +73,33 @@ public class PlayerHealth : MonoBehaviour
         OnHealthChanged?.Invoke(currentHealth / maxHealth);
     }
 
+    public void Respawn()
+    {
+        isDead = false;
+        currentHealth = maxHealth;
+        OnHealthChanged?.Invoke(1f);
+        
+        // Also call Controller Respawn
+        if (TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.Respawn();
+        }
+    }
+
     private void Die()
     {
         isDead = true;
         OnDeath?.Invoke();
         
-        // Call explicit Die method on Controller
+        // Disable Controller
         if (TryGetComponent<PlayerController>(out var controller))
         {
             controller.Die();
         }
+
+        // Show UI via Manager
+        var uiManager = FindAnyObjectByType<GameUIManager>();
+        if (uiManager) uiManager.ShowGameOver();
     }
 
 

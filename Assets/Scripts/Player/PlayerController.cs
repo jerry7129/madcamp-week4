@@ -40,6 +40,10 @@ public class PlayerController : MonoBehaviour
     private bool isCharging = false; 
     private bool canDash = true;
     private bool controlsPaused = false; 
+    private bool isDead = false; // Track death state locally
+
+    // Respawn Data
+    private Vector3 initialPosition;
 
     // UI Helpers
     public float GetDashCooldownRatio() 
@@ -55,61 +59,98 @@ public class PlayerController : MonoBehaviour
     }
     private float currentCooldownTimer = 0f; 
 
-
-
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        initialPosition = transform.position; // Cache start pos
+
         if(rb) 
         {
-            rb.sleepMode = RigidbodySleepMode2D.NeverSleep; // Prevent sleeping for reliable hit detection
-            defaultGravityScale = rb.gravityScale; // Cache initial gravity
+            rb.sleepMode = RigidbodySleepMode2D.NeverSleep; 
+            defaultGravityScale = rb.gravityScale; 
         }
-        animator = GetComponent<Animator>(); // Auto-get parameter
+        animator = GetComponent<Animator>(); 
         
-        // 1. Fix Rotation (Prevent Toppling)
+        // 1. Fix Rotation
         if (rb) rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-        // 2. Fix Sticking (Prevent Wall/Enemy Stick)
-        // Create Frictionless Material in memory
+        // 2. Fix Sticking
         PhysicsMaterial2D slipperyMat = new PhysicsMaterial2D("Slippery");
         slipperyMat.friction = 0f;
         slipperyMat.bounciness = 0f;
         
-        // Apply to all Colliders on this object
         Collider2D[] colls = GetComponents<Collider2D>();
         foreach(var c in colls) c.sharedMaterial = slipperyMat;
 
-        // Auto-assign GroundCheck if missing
+        // 3. Auto-assign GroundCheck
         if (groundCheck == null)
         {
             Transform foundCheck = transform.Find("GroundCheck");
-            if (foundCheck != null)
-            {
-                groundCheck = foundCheck;
-            }
-            else
-            {
-                // GroundCheck not found - Silent
-            }
+            if (foundCheck != null) groundCheck = foundCheck;
         }
 
-        // Auto-assign GroundLayer if Nothing (0)
+        // 4. Auto-assign GroundLayer
         if (groundLayer.value == 0)
         {
-            // Default to Default, Ground, Wall
-            // Ensure Enemy is NOT ground if you don't want to jump off their head.
             groundLayer = LayerMask.GetMask("Default", "Ground", "Wall"); 
-            if(groundLayer.value == 0) groundLayer = -1; // Everything
+            if(groundLayer.value == 0) groundLayer = -1; 
         }
 
-        // Ensure components are off by default
+        // 5. Ensure components are off
         if(attackCollider) attackCollider.SetActive(false);
         if(normalAttackCollider) normalAttackCollider.SetActive(false);
 
-        // Cache Layers
+        // 6. Cache Layers
         playerLayer = LayerMask.NameToLayer("Player");
         enemyLayer = LayerMask.NameToLayer("Enemy");
+    }
+
+    public void Respawn()
+    {
+        isDead = false;
+        controlsPaused = false;
+        isDashing = false;
+        isAttacking = false;
+        
+        // Reset Position
+        transform.position = initialPosition;
+        rb.linearVelocity = Vector2.zero;
+        SnapToGravity(); 
+
+        // Reset Animation
+        if(animator)
+        {
+            animator.Rebind(); 
+            animator.Update(0f); 
+        }
+        
+        // Reset Colliders
+        if(attackCollider) attackCollider.SetActive(false);
+        if(normalAttackCollider) normalAttackCollider.SetActive(false);
+        
+        // Reset Effects
+        if(dashParticle) dashParticle.Stop();
+        isCharging = false;
+        canDash = true;
+    }
+
+    public void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+        
+        // Stop Movement
+        rb.linearVelocity = Vector2.zero;
+        moveInput = Vector2.zero;
+        
+        // Cancel Charge/Dash
+        isCharging = false;
+        isDashing = false;
+        if(dashParticle) dashParticle.Stop();
+        if(attackCollider) attackCollider.SetActive(false);
+        if(normalAttackCollider) normalAttackCollider.SetActive(false);
+
+        if(animator) animator.SetTrigger("Die");
     }
 
     public void PauseControls(float duration)
@@ -120,35 +161,12 @@ public class PlayerController : MonoBehaviour
     IEnumerator PauseControlsRoutine(float duration)
     {
         controlsPaused = true;
-        moveInput = Vector2.zero; // Reset internal input
-        rb.linearVelocity = Vector2.zero; // Optional: Stop sliding too
+        moveInput = Vector2.zero; 
+        rb.linearVelocity = Vector2.zero; 
         
         yield return new WaitForSeconds(duration);
         
-        controlsPaused = false;
-    }
-
-    public void Die()
-    {
-        // 1. Stop everything immediately (Dash, Charge, Attack)
-        StopAllCoroutines(); 
-
-        // 2. Disable Controls Permanently
-        controlsPaused = true;
-        isDashing = false;
-        isCharging = false;
-        isAttacking = false;
-        canDash = false;
-
-        // 3. Stop Physics
-        if(rb) rb.linearVelocity = Vector2.zero;
-        moveInput = Vector2.zero;
-
-        // 4. Visuals
-        if(animator) animator.SetTrigger("Die");
-        
-        // Optional: Disable colliders if needed, or keep them to prevent falling through floor
-        // GetComponent<Collider2D>().enabled = false; 
+        if(!isDead) controlsPaused = false;
     }
 
     // Sixfold State
@@ -160,6 +178,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // 0. Dead Check
+        if (isDead) return;
+
         // 1. Move Input & Actions (Blocked if Paused/Dashing/Charging/Attacking)
         if (!controlsPaused && !isDashing && !isCharging && !isAttacking)
         {
@@ -304,6 +325,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // ... (existing Start code if any, though currently Awake is used mostly)
+        // Force Snap Rotation to Gravity on Start (No Slerp)
+        SnapToGravity();
+    }
+
     void AlignToGravity()
     {
         // 1. Determine "Up" based on Gravity
@@ -313,21 +341,27 @@ public class PlayerController : MonoBehaviour
         Vector2 targetUp = -g.normalized;
 
         // 2. Calculate Target Angle (Degrees)
-        // Standard Atan2 returns angle from Right (1,0). 
-        // Our sprite "Up" is (0,1). So we subtract 90 degrees.
-        // ex: Target Up is (0,1). Atan2(1,0) = 90. 90-90 = 0.
-        // ex: Target Up is (1,0). Atan2(0,1) = 0. 0-90 = -90.
         float targetAngle = Mathf.Atan2(targetUp.y, targetUp.x) * Mathf.Rad2Deg - 90f;
-
-        // 3. Create Rotation
         Quaternion targetRotation = Quaternion.Euler(0, 0, targetAngle);
 
-        // 4. Smooth Rotate
+        // 3. Smooth Rotate
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+    }
+
+    public void SnapToGravity()
+    {
+        Vector2 g = Physics2D.gravity;
+        if (g == Vector2.zero) return; 
+
+        Vector2 targetUp = -g.normalized;
+        float targetAngle = Mathf.Atan2(targetUp.y, targetUp.x) * Mathf.Rad2Deg - 90f;
+        transform.rotation = Quaternion.Euler(0, 0, targetAngle);
     }
 
     void FixedUpdate()
     {
+        if (isDead) return;
+
         CheckGrounded();
         if (!isDashing && !isCharging && !isAttacking)
         {
@@ -389,7 +423,14 @@ public class PlayerController : MonoBehaviour
                  
                  if (hit.distance < maxDist) 
                  {
-                     isGrounded = true;
+                     // KEY FIX: Only snap/ground via Raycast if NOT in Jump Lockout
+                     // This prevents "Double Jumping" and "Velocity Killing" on start of jump
+                     if (slopeLockoutTimer <= 0)
+                     {
+                         isGrounded = true;
+                     }
+
+                     // Keep tracking slope data anyway for smooth transitions
                      slopeAngle = angle;
                      slopeHit = hit;
                      slopeNormalPerp = Vector2.Perpendicular(hit.normal).normalized;
