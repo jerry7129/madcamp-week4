@@ -72,9 +72,11 @@ public class PlayerHealth : MonoBehaviour
         isDead = true;
         OnDeath?.Invoke();
         
-        // Optional: Disable controls, play animation, show Game Over screen
-        GetComponent<PlayerController>()?.PauseControls(999f);
-        GetComponent<Animator>()?.SetTrigger("Die");
+        // Call explicit Die method on Controller
+        if (TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.Die();
+        }
     }
 
 

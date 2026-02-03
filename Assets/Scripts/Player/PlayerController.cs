@@ -60,6 +60,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        if(rb) rb.sleepMode = RigidbodySleepMode2D.NeverSleep; // Prevent sleeping for reliable hit detection
         animator = GetComponent<Animator>(); // Auto-get parameter
         
         // 1. Fix Rotation (Prevent Toppling)
@@ -121,6 +122,29 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(duration);
         
         controlsPaused = false;
+    }
+
+    public void Die()
+    {
+        // 1. Stop everything immediately (Dash, Charge, Attack)
+        StopAllCoroutines(); 
+
+        // 2. Disable Controls Permanently
+        controlsPaused = true;
+        isDashing = false;
+        isCharging = false;
+        isAttacking = false;
+        canDash = false;
+
+        // 3. Stop Physics
+        if(rb) rb.linearVelocity = Vector2.zero;
+        moveInput = Vector2.zero;
+
+        // 4. Visuals
+        if(animator) animator.SetTrigger("Die");
+        
+        // Optional: Disable colliders if needed, or keep them to prevent falling through floor
+        // GetComponent<Collider2D>().enabled = false; 
     }
 
     // Sixfold State
@@ -204,11 +228,21 @@ public class PlayerController : MonoBehaviour
             // 2. Thunderclap Input (Left Mouse Click)
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && canDash)
             {
-                Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-                mouseWorldPos.z = transform.position.z; // Flatten Z
-                Vector2 dashDir = (mouseWorldPos - transform.position).normalized;
+                Camera cam = Camera.main;
+                if (cam == null) cam = FindFirstObjectByType<Camera>(); // Fallback
 
-                StartCoroutine(ThunderclapAndFlash(dashDir));
+                if (cam != null)
+                {
+                    Vector3 mouseWorldPos = cam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+                    mouseWorldPos.z = transform.position.z; // Flatten Z
+                    Vector2 dashDir = (mouseWorldPos - transform.position).normalized;
+
+                    StartCoroutine(ThunderclapAndFlash(dashDir));
+                }
+                else
+                {
+                    Debug.LogWarning("No Main Camera found! Cannot target Thunderclap.");
+                }
             }
 
             // 3. Normal Attack (Ctrl Key)

@@ -68,24 +68,75 @@ public class CreateLightningEffect : MonoBehaviour
         sizeOverLifetime.enabled = true;
         sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 0)));
 
-        // 6. Renderer (PIXEL ART STYLE)
-        // Use a Hard-Edge Square Texture for "Pixel" look
-        Texture2D pixelTex = new Texture2D(1, 1);
-        pixelTex.SetPixel(0, 0, Color.white);
-        pixelTex.filterMode = FilterMode.Point; // Critical for Pixel Look
-        pixelTex.Apply();
+        // 6. Renderer (PIXEL ART STYLE) - PERSISTENT ASSET FIX
+        
+        string matPath = "Assets/Materials/PixelParticle.mat";
+        string texPath = "Assets/Materials/PixelSquare.png";
 
-        // ALIGN TO DIRECTION Logic:
+        // A. Ensure Texture Exists
+        Texture2D pixelTex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
+        if (pixelTex == null)
+        {
+            pixelTex = new Texture2D(32, 32); // Slightly larger for MIP preservation if needed, but 1x1 is fine too.
+            // Fill white
+            Color[] pixels = new Color[32 * 32];
+            for(int i=0; i<pixels.Length; i++) pixels[i] = Color.white;
+            pixelTex.SetPixels(pixels);
+            pixelTex.Apply();
+
+            byte[] bytes = pixelTex.EncodeToPNG();
+            System.IO.File.WriteAllBytes(texPath, bytes);
+            AssetDatabase.Refresh();
+            
+            // Re-import to set Filter Mode
+            TextureImporter importer = AssetImporter.GetAtPath(texPath) as TextureImporter;
+            if (importer != null)
+            {
+                importer.filterMode = FilterMode.Point;
+                importer.mipmapEnabled = false;
+                importer.textureType = TextureImporterType.Default;
+                importer.SaveAndReimport();
+            }
+            
+            pixelTex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath); // Load fresh
+        }
+
+        // B. Ensure Material Exists
+        Material pixelMat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+        if (pixelMat == null)
+        {
+            pixelMat = new Material(Shader.Find("Particles/Standard Unlit")); // Better for particles
+            pixelMat.mainTexture = pixelTex;
+            
+            // Allow Vertex Color (StartColor/ColorOverLifetime) to tint it
+            // Standard Unlit usually allows this by default.
+            
+            // Set Blend Mode to Additive or Alpha Blended? 
+            // Lightning usually looks good Additive, but "Pixel Art" might want Alpha.
+            // Let's stick to Standard Unlit default (Opaque/Cutout/Fade/Transparent).
+            // We'll set it to Fade or Transparent.
+            
+            pixelMat.SetFloat("_Mode", 2); // Fade
+            // Fix keywords for Fade
+            pixelMat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            pixelMat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            pixelMat.SetInt("_ZWrite", 0);
+            pixelMat.DisableKeyword("_ALPHATEST_ON");
+            pixelMat.EnableKeyword("_ALPHABLEND_ON");
+            pixelMat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            pixelMat.renderQueue = 3000;
+
+            AssetDatabase.CreateAsset(pixelMat, matPath);
+        }
+        
+        // C. Assign
         psr.renderMode = ParticleSystemRenderMode.Stretch;
-        psr.cameraVelocityScale = 0f; // Ignore Camera
-        psr.velocityScale = 0.02f; // REDUCED scale (Less stretch = More blocky)
+        psr.cameraVelocityScale = 0f; 
+        psr.velocityScale = 0.02f; 
         psr.lengthScale = 1f;
         
-        Material pixelMat = new Material(Shader.Find("Sprites/Default"));
-        pixelMat.mainTexture = pixelTex;
-        
         psr.material = pixelMat;
-        psr.trailMaterial = pixelMat; // Apply to Trails too!
+        psr.trailMaterial = pixelMat;
         
         Selection.activeGameObject = go;
     }

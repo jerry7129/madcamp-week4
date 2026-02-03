@@ -13,6 +13,11 @@ public class DamageDealer : MonoBehaviour
         hitTargets.Clear();
     }
 
+    public void BeginAttack()
+    {
+        hitTargets.Clear();
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         TryDealDamage(other);

@@ -25,6 +25,7 @@ public class DoppelgangerAI : MonoBehaviour
         // Init components early
         if (!animator) animator = GetComponent<Animator>();
         if (!rb) rb = GetComponent<Rigidbody2D>();
+        if (rb) rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
         if (!spriteRenderer) spriteRenderer = GetComponent<SpriteRenderer>();
 
  
@@ -56,6 +57,9 @@ public class DoppelgangerAI : MonoBehaviour
 
         // 1. Prevent falling over (Lying down bug) - But we will MANUALLY rotate to gravity
         if (rb) rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        
+        // Ensure Hitbox starts OFF
+        if (attackHitbox && attackHitbox.activeSelf) attackHitbox.SetActive(false);
     }
 
     public void PauseAI(float duration)
@@ -224,13 +228,18 @@ public class DoppelgangerAI : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
 
         // Hitbox ON
-        if(attackHitbox) attackHitbox.SetActive(true);
+        if(attackHitbox) 
+        {
+            // Explicitly Reset Damage History
+            DamageDealer dd = attackHitbox.GetComponent<DamageDealer>();
+            if(dd) dd.BeginAttack();
+            
+            attackHitbox.SetActive(true);
+        }
 
         yield return new WaitForSeconds(0.3f); // Attack duration
 
         // Hitbox OFF
-        if(attackHitbox) attackHitbox.SetActive(false);
-
         if(attackHitbox) attackHitbox.SetActive(false);
 
         isAttacking = false;
