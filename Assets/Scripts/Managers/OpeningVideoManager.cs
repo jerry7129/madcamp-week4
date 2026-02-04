@@ -43,12 +43,24 @@ public class OpeningVideoManager : MonoBehaviour
         // Hide Menu
         if (menuUIRoot) menuUIRoot.SetActive(false);
 
+        // Hide Background Group (so borders are black)
+        GameObject bgGroup = GameObject.Find("Background_Group");
+        if (bgGroup) bgGroup.SetActive(false);
+
+        // Enforce Black Background
+        if (videoPlayer.targetCamera != null)
+        {
+            videoPlayer.targetCamera.clearFlags = CameraClearFlags.SolidColor;
+            videoPlayer.targetCamera.backgroundColor = Color.black;
+        }
+
         // Show Video UI (if any)
         if (videoDisplayUI) videoDisplayUI.SetActive(true);
 
         // Setup and Play
         videoPlayer.source = VideoSource.VideoClip;
         videoPlayer.clip = openingClip;
+        videoPlayer.aspectRatio = VideoAspectRatio.FitInside; // Black bars
         videoPlayer.isLooping = false;
         videoPlayer.Play();
     }
