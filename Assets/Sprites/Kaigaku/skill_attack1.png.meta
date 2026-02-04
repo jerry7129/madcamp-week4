@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 24ea58b12b26c5645b3f9f11062fe765
+guid: 8f006c0c347df594c9f2028fc39fe453
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -115,7 +115,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: attack1_0
+      name: skill_attack1_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,16 +128,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 733ba6184e8011420800000000000000
-      internalID: 2598868237486306103
+      spriteID: d875953ac287d1f4a9860c301bec72e8
+      internalID: -1835083730
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: attack1_1
+      name: skill_attack1_1
       rect:
         serializedVersion: 2
         x: 64
@@ -150,16 +150,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: adaaa110c3c6bcbb0800000000000000
-      internalID: -4914715563372401958
+      spriteID: 069aaa2313d3c9f4cb69c571d4067b3e
+      internalID: -1496850464
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: attack1_2
+      name: skill_attack1_2
       rect:
         serializedVersion: 2
         x: 128
@@ -172,16 +172,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 9fc92e01bd1b9e420800000000000000
-      internalID: 2659852609378229497
+      spriteID: d4b67f03b26517f4790ed00399701b3e
+      internalID: -560006032
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: attack1_3
+      name: skill_attack1_3
       rect:
         serializedVersion: 2
         x: 192
@@ -194,16 +194,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c7a2833eb6b63b5f0800000000000000
-      internalID: -742131402468218244
+      spriteID: efb26396350974644aeca960a599e92c
+      internalID: -1526190133
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: attack1_4
+      name: skill_attack1_4
       rect:
         serializedVersion: 2
         x: 256
@@ -216,16 +216,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d59a440b782082040800000000000000
-      internalID: 4622947799296944477
+      spriteID: 7cb9ca328b29b014e9e3086e2d9adc56
+      internalID: 534839383
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: attack1_5
+      name: skill_attack1_5
       rect:
         serializedVersion: 2
         x: 320
@@ -238,10 +238,10 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 7e5c60e1fa29ae0b0800000000000000
-      internalID: -5698581097663248921
+      spriteID: 70c6a4232de781d4c95e4a98c5daf3ad
+      internalID: 1712803721
       vertices: []
       indices: 
       edges: []
@@ -250,7 +250,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 1206063b8fc2d0a4984ceb4104e580df
+    spriteID: 54cec47ba8128c14b93abd20d9b18bb5
     internalID: 0
     vertices: []
     indices: 
@@ -262,12 +262,12 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      attack1_0: 2598868237486306103
-      attack1_1: -4914715563372401958
-      attack1_2: 2659852609378229497
-      attack1_3: -742131402468218244
-      attack1_4: 4622947799296944477
-      attack1_5: -5698581097663248921
+      skill_attack1_0: -1835083730
+      skill_attack1_1: -1496850464
+      skill_attack1_2: -560006032
+      skill_attack1_3: -1526190133
+      skill_attack1_4: 534839383
+      skill_attack1_5: 1712803721
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

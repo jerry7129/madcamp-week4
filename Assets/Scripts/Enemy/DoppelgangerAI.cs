@@ -120,14 +120,25 @@ public class DoppelgangerAI : MonoBehaviour
         // --- AI LOGIC (Decision Making) ---
         float dist = Vector3.Distance(transform.position, target.position);
         
-        // Attack Logic
+        // Attack Logic (Melee)
         if (dist <= attackRange)
         {
             moveInputX = 0; // Stop moving to attack
             if (Time.time >= lastAttackTime + attackCooldown && !isAttacking)
             {
-                StartCoroutine(AttackRoutine());
+                StartCoroutine(AttackRoutine(false)); // Normal Attack
             }
+        }
+        // Skill Logic (Ranged)
+        else if (dist <= skillRange)
+        {
+             // Only stop if we are actually attacking or about to attack
+             if (Time.time >= lastSkillTime + skillCooldown && !isAttacking)
+             {
+                 moveInputX = 0;
+                 StartCoroutine(AttackRoutine(true)); // Skill Attack
+             }
+             // Otherwise continue chasing if not attacking (handled below)
         }
         // Chase Logic
         else if (dist <= detectRange && !isAttacking)
@@ -317,10 +328,38 @@ public class DoppelgangerAI : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator AttackRoutine()
+    [Header("Combat")]
+    public float skillRange = 10f;
+    public float skillCooldown = 5f;
+    private float lastSkillTime = -99f;
+
+    public GameObject swordProjectilePrefab;
+    public Transform firePoint; 
+    [Tooltip("Number of projectiles per attack")]
+    public int projectilesPerAttack = 3;
+    [Tooltip("Delay between projectiles")]
+    public float projectileInterval = 0.2f;
+
+    // ... existing code ...
+
+    // Update Decision Logic
+    // In Update():
+    /*
+        // Attack Logic (Melee)
+        if (dist <= attackRange && Time.time >= lastAttackTime + attackCooldown && !isAttacking)
+        {
+            StartCoroutine(AttackRoutine(false)); // Normal Attack
+        }
+        // Skill Logic (Ranged)
+        else if (dist <= skillRange && Time.time >= lastSkillTime + skillCooldown && !isAttacking)
+        {
+            StartCoroutine(AttackRoutine(true)); // Skill Attack
+        }
+    */
+
+    System.Collections.IEnumerator AttackRoutine(bool isSkill)
     {
         isAttacking = true;
-        lastAttackTime = Time.time;
         
         rb.linearVelocity = Vector2.zero;
         if(animator) animator.SetBool("isRunning", false);
@@ -331,22 +370,92 @@ public class DoppelgangerAI : MonoBehaviour
         if (dot > 0) transform.localScale = Vector3.one;
         else transform.localScale = new Vector3(-1, 1, 1);
 
-        if(animator) animator.SetTrigger("Attack");
-
-        yield return new WaitForSeconds(0.1f);
-
-        if(attackHitbox) 
+        if (isSkill)
         {
-            DamageDealer dd = attackHitbox.GetComponent<DamageDealer>();
-            if(dd) dd.BeginAttack();
-            attackHitbox.SetActive(true);
+            // --- SKILL ATTACK (Projectiles) ---
+            lastSkillTime = Time.time;
+            if(animator) animator.SetTrigger("SkillAttack"); // New Trigger
+            
+            yield return new WaitForSeconds(0.3f); // Windup for Skill
+
+            // Fire Projectiles
+            if (swordProjectilePrefab != null)
+            {
+                for (int i = 0; i < projectilesPerAttack; i++)
+                {
+                    FireProjectile();
+                    yield return new WaitForSeconds(projectileInterval);
+                }
+            }
+            
+            yield return new WaitForSeconds(0.5f); // Recovery
+        }
+        else
+        {
+            // --- NORMAL ATTACK (Melee) ---
+            lastAttackTime = Time.time;
+            if(animator) animator.SetTrigger("Attack");
+
+            yield return new WaitForSeconds(0.1f); // Windup
+
+            if(attackHitbox) 
+            {
+                DamageDealer dd = attackHitbox.GetComponent<DamageDealer>();
+                if(dd) dd.BeginAttack();
+                attackHitbox.SetActive(true);
+            }
+
+            yield return new WaitForSeconds(0.3f); // Active Duration
+
+            if(attackHitbox) attackHitbox.SetActive(false);
         }
 
-        yield return new WaitForSeconds(0.3f); 
-
-        if(attackHitbox) attackHitbox.SetActive(false);
-
         isAttacking = false;
+    }
+
+    void FireProjectile()
+    {
+        Vector3 spawnPos = transform.position; // Changed to Vector3
+        if (firePoint != null) spawnPos = firePoint.position;
+        else spawnPos = transform.position + (transform.right * (transform.localScale.x > 0 ? 1 : -1) * 1.0f);
+
+        GameObject proj = Instantiate(swordProjectilePrefab, spawnPos, Quaternion.identity);
+        
+        // 1. Determine Target Direction
+        Vector3 dir;
+        if (target != null)
+        {
+            dir = (target.position - spawnPos).normalized;
+        }
+        else
+        {
+            // If no target, fire in facing direction
+            dir = (transform.localScale.x > 0) ? Vector3.right : Vector3.left;
+        }
+
+        // 2. Calculate Rotation (Z-Angle)
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        proj.transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        // 3. Handle Visual Orientation (Gravity Aware)
+        // We want the projectile's 'Up' to align somewhat with the World's 'Up' (Gravity Up).
+        // If Gravity is inverted, the projectile should look upside down relative to World (Upright relative to Boss).
+        
+        Vector2 gravityUp = Physics2D.gravity.magnitude > 0.1f ? -Physics2D.gravity.normalized : Vector2.up;
+        Vector2 projectileUp = proj.transform.rotation * Vector3.up; 
+
+        // Check alignment
+        bool shouldFlipY = Vector2.Dot(projectileUp, gravityUp) < -0.1f; // Threshold to avoid flickering at 90 deg
+
+        Vector3 defaultScale = proj.transform.localScale;
+        defaultScale = new Vector3(Mathf.Abs(defaultScale.x), Mathf.Abs(defaultScale.y), defaultScale.z);
+
+        if (shouldFlipY)
+        {
+             defaultScale.y = -defaultScale.y; 
+        }
+        
+        proj.transform.localScale = defaultScale;
     }
     
     void OnDrawGizmos()
