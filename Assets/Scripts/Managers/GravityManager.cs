@@ -9,6 +9,12 @@ public class GravityManager : MonoBehaviour
     public float maxTime = 15f;
     public AudioClip biwaSound;
 
+    [Header("Allowed Gravities")]
+    public bool allowDown = true;
+    public bool allowUp = true;
+    public bool allowLeft = true;
+    public bool allowRight = true;
+
     [Header("References")]
     public Transform playerTransform;
     public Transform cameraTransform;
@@ -58,15 +64,34 @@ public class GravityManager : MonoBehaviour
 
             if (biwaSound) audioSource.PlayOneShot(biwaSound);
 
-            // Random Gravity Direction (Ensure change)
-            Vector2[] directions = { Vector2.down, Vector2.up, Vector2.left, Vector2.right };
+            // Filter Directions
+            System.Collections.Generic.List<Vector2> validDirections = new System.Collections.Generic.List<Vector2>();
+            if (allowDown) validDirections.Add(Vector2.down);
+            if (allowUp) validDirections.Add(Vector2.up);
+            if (allowLeft) validDirections.Add(Vector2.left);
+            if (allowRight) validDirections.Add(Vector2.right);
+
+            // Fallback if none selected
+            if (validDirections.Count == 0) validDirections.Add(Vector2.down);
+
             Vector2 currentDir = Physics2D.gravity.normalized;
             Vector2 newGravity;
             
-            do
+            // If only one option available, just use it (even if same)
+            if (validDirections.Count == 1)
             {
-                newGravity = directions[Random.Range(0, directions.Length)];
-            } while (Vector2.Distance(newGravity, currentDir) < 0.1f);
+                 newGravity = validDirections[0];
+            }
+            else
+            {
+                // Try to pick a new one, but don't loop forever if only current is valid (shouldn't happen if Count > 1)
+                int attempts = 0;
+                do
+                {
+                    newGravity = validDirections[Random.Range(0, validDirections.Count)];
+                    attempts++;
+                } while (Vector2.Distance(newGravity, currentDir) < 0.1f && attempts < 10);
+            }
 
             // Calculate rotation angle change (From Old Gravity to New Gravity)
             float rotationDiff = Vector2.SignedAngle(currentDir, newGravity);
