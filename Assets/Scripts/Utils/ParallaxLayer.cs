@@ -12,6 +12,20 @@ public class ParallaxLayer : MonoBehaviour
     [Tooltip("If true, the background will repeat infinitely on Y axis")]
     public bool infiniteVertical = false;
 
+    [Tooltip("Horizontal clone layers (1 = 1 left + 1 right)")]
+    [Range(0, 10)]
+    public int cloneGridRadiusX = 1;
+
+    [Tooltip("Vertical clone layers (1 = 1 up + 1 down)")]
+    [Range(0, 10)]
+    public int cloneGridRadiusY = 1;
+
+    [Tooltip("Extra spacing between clones (Negative = Overlap, Positive = Gap)")]
+    public Vector2 cloneGap = new Vector2(-0.05f, -0.05f);
+
+    [Tooltip("Automatic scrolling speed (e.g. for Main Menu)")]
+    public Vector2 autoScrollSpeed = Vector2.zero;
+
     private Transform cameraTransform;
     private Vector3 lastCameraPosition;
     private float textureUnitSizeX;
@@ -32,25 +46,20 @@ public class ParallaxLayer : MonoBehaviour
         if (sprite != null)
         {
             Texture2D texture = sprite.sprite.texture;
-            // Subtract small overlap (0.05f) to prevent seams/gaps
-            // USE RECT instead of TEXTURE to support sliced sprites/atlases correctly
-            textureUnitSizeX = (sprite.sprite.rect.width / sprite.sprite.pixelsPerUnit) - 0.05f; 
-            textureUnitSizeY = (sprite.sprite.rect.height / sprite.sprite.pixelsPerUnit) - 0.05f;
+            
+            // Calculate Unit Size based on Rect (for Atlases) + User defined Gap
+            textureUnitSizeX = (sprite.sprite.rect.width / sprite.sprite.pixelsPerUnit) + cloneGap.x; 
+            textureUnitSizeY = (sprite.sprite.rect.height / sprite.sprite.pixelsPerUnit) + cloneGap.y;
 
-            // NEW: Create 3x3 Grid of Sidekicks (9 directions total including center)
-            if (infiniteHorizontal || infiniteVertical) // Or just always if you want robust coverage
+            // NEW: Create dynamic Grid of Sidekicks based on split radius
+            if (infiniteHorizontal || infiniteVertical) 
             {
-                for (int x = -1; x <= 1; x++)
+                for (int x = -cloneGridRadiusX; x <= cloneGridRadiusX; x++)
                 {
-                    for (int y = -1; y <= 1; y++)
+                    for (int y = -cloneGridRadiusY; y <= cloneGridRadiusY; y++)
                     {
                         if (x == 0 && y == 0) continue; // Skip self
 
-                        // Check if we should generate this neighbor based on flags?
-                        // User asked for "9 directions", so we generate the full surrounding grid
-                        // to ensure no voids appear even on diagonals.
-                        // You might want to restrict this if strictly only horizontal is needed,
-                        // but 9-way ensures safety.
                         CreateSidekick(sprite, x * textureUnitSizeX, y * textureUnitSizeY);
                     }
                 }
@@ -82,6 +91,9 @@ public class ParallaxLayer : MonoBehaviour
         
         // Apply Parallax
         transform.position += new Vector3(deltaMovement.x * parallaxEffect.x, deltaMovement.y * parallaxEffect.y, 0);
+        
+        // Apply Auto Scroll
+        transform.position += (Vector3)autoScrollSpeed * Time.deltaTime;
 
         lastCameraPosition = cameraTransform.position;
 

@@ -114,6 +114,39 @@ public class MainMenuBuilder : MonoBehaviour
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
         
+        // 7. Auto-Scrolling Backgrounds
+        GameObject bgGroup = GameObject.Find("Background_Group");
+        if (bgGroup) DestroyImmediate(bgGroup); 
+        bgGroup = new GameObject("Background_Group");
+
+        string[] bgFiles = { "background-layer1.png", "background-layer2.png", "background-layer3.png" };
+        float[] speeds = { 2f, 4f, 8f }; // Slow to fast
+        int[] orders = { -20, -10, -5 };
+
+        for (int i = 0; i < 3; i++)
+        {
+            string path = "Assets/Sprites/Environment/" + bgFiles[i];
+            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sprite == null) 
+            {
+                Debug.LogWarning("Background sprite not found at: " + path);
+                continue;
+            }
+
+            GameObject layer = new GameObject("Layer_" + (i+1));
+            layer.transform.SetParent(bgGroup.transform);
+            layer.transform.localScale = Vector3.one * 2f; // Scale up like in Map
+            
+            SpriteRenderer sr = layer.AddComponent<SpriteRenderer>();
+            sr.sprite = sprite;
+            sr.sortingOrder = orders[i];
+
+            ParallaxLayer pl = layer.AddComponent<ParallaxLayer>();
+            pl.infiniteHorizontal = true;
+            pl.autoScrollSpeed = new Vector2(speeds[i], 0); 
+            pl.parallaxEffect = Vector2.zero; // Static camera, so no move parallax
+        }
+
         Debug.Log("Main Menu Built Successfully!");
     }
 }

@@ -1,0 +1,403 @@
+fileFormatVersion: 2
+guid: 034ffd6c11123fc41a391623eefaaf45
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5006531217111041513
+    second: middle-background-layer2_0
+  - first:
+      213: -5785427971497470985
+    second: middle-background-layer2_1
+  - first:
+      213: -454864426701331336
+    second: middle-background-layer2_2
+  - first:
+      213: 8584536498836142985
+    second: middle-background-layer2_3
+  - first:
+      213: -8546162690131907989
+    second: middle-background-layer2_4
+  - first:
+      213: -3905760203490817858
+    second: middle-background-layer2_5
+  - first:
+      213: -8334324820115569078
+    second: middle-background-layer2_6
+  - first:
+      213: -2608679557899744118
+    second: middle-background-layer2_7
+  - first:
+      213: 5502098523096792988
+    second: middle-background-layer2_8
+  - first:
+      213: 4472697043839651190
+    second: middle-background-layer2_9
+  - first:
+      213: 6710669354662384191
+    second: middle-background-layer2_10
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: middle-background-layer2_0
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 655
+        width: 262
+        height: 173
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71a313f326a358ab0800000000000000
+      internalID: -5006531217111041513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_1
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 827
+        width: 256
+        height: 117
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f3d84599e706bfa0800000000000000
+      internalID: -5785427971497470985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_2
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 810
+        width: 260
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8746181c63fffa9f0800000000000000
+      internalID: -454864426701331336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_3
+      rect:
+        serializedVersion: 2
+        x: 758
+        y: 511
+        width: 271
+        height: 153
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98bf08e7676622770800000000000000
+      internalID: 8584536498836142985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_4
+      rect:
+        serializedVersion: 2
+        x: 1281
+        y: 663
+        width: 255
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6aadf5105ee56980800000000000000
+      internalID: -8546162690131907989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 411
+        width: 249
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb8821dd9c3fbc9c0800000000000000
+      internalID: -3905760203490817858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_6
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 407
+        width: 245
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a464a46bbb7865c80800000000000000
+      internalID: -8334324820115569078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_7
+      rect:
+        serializedVersion: 2
+        x: 504
+        y: 287
+        width: 253
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8c009273cb1ccbd0800000000000000
+      internalID: -2608679557899744118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 249
+        height: 271
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9fb26494716b5c40800000000000000
+      internalID: 5502098523096792988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_9
+      rect:
+        serializedVersion: 2
+        x: 760
+        y: 144
+        width: 265
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67d80069346321e30800000000000000
+      internalID: 4472697043839651190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: middle-background-layer2_10
+      rect:
+        serializedVersion: 2
+        x: 1264
+        y: 0
+        width: 272
+        height: 156
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3250c13936112d50800000000000000
+      internalID: 6710669354662384191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      middle-background-layer2_0: -5006531217111041513
+      middle-background-layer2_1: -5785427971497470985
+      middle-background-layer2_10: 6710669354662384191
+      middle-background-layer2_2: -454864426701331336
+      middle-background-layer2_3: 8584536498836142985
+      middle-background-layer2_4: -8546162690131907989
+      middle-background-layer2_5: -3905760203490817858
+      middle-background-layer2_6: -8334324820115569078
+      middle-background-layer2_7: -2608679557899744118
+      middle-background-layer2_8: 5502098523096792988
+      middle-background-layer2_9: 4472697043839651190
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
