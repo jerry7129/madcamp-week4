@@ -12,9 +12,9 @@ public class BackgroundGroup : MonoBehaviour
     private Coroutine fadeRoutine;
     private float targetAlpha = 1f;
 
-    void Awake()
+    void Start()
     {
-        // Gather all sprites in this group (including children)
+        // Gather all sprites in this group (including children created in Awake by ParallaxLayer)
         sprites.AddRange(GetComponentsInChildren<SpriteRenderer>(true));
 
         if (startVisible)

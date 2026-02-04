@@ -17,7 +17,7 @@ public class ParallaxLayer : MonoBehaviour
     private float textureUnitSizeX;
     private float textureUnitSizeY;
 
-    void Start()
+    void Awake()
     {
         Camera mainCam = Camera.main;
         if (mainCam == null) mainCam = FindFirstObjectByType<Camera>(); 
@@ -33,8 +33,9 @@ public class ParallaxLayer : MonoBehaviour
         {
             Texture2D texture = sprite.sprite.texture;
             // Subtract small overlap (0.05f) to prevent seams/gaps
-            textureUnitSizeX = (texture.width / sprite.sprite.pixelsPerUnit) - 0.05f; 
-            textureUnitSizeY = (texture.height / sprite.sprite.pixelsPerUnit) - 0.05f;
+            // USE RECT instead of TEXTURE to support sliced sprites/atlases correctly
+            textureUnitSizeX = (sprite.sprite.rect.width / sprite.sprite.pixelsPerUnit) - 0.05f; 
+            textureUnitSizeY = (sprite.sprite.rect.height / sprite.sprite.pixelsPerUnit) - 0.05f;
 
             // NEW: Create 3x3 Grid of Sidekicks (9 directions total including center)
             if (infiniteHorizontal || infiniteVertical) // Or just always if you want robust coverage
