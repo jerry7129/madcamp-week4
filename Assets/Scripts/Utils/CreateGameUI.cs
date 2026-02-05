@@ -93,11 +93,46 @@ public class CreateGameUI : MonoBehaviour
         cooldownImg.fillOrigin = 2; // Top
         cooldownImg.fillClockwise = false;
 
-        // 5. Link to Manager
+        // 5. Create Game Clear Panel
+        GameObject gameClearPanel = CreateRect(canvasObj.transform, "GameClearPanel", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        Image clearBg = gameClearPanel.AddComponent<Image>();
+        clearBg.color = new Color(0, 0, 0, 0.8f);
+        
+        GameObject clearTextObj = CreateRect(gameClearPanel.transform, "ClearText", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 50), new Vector2(400, 100));
+        Text clearText = clearTextObj.AddComponent<Text>();
+        clearText.text = "GAME CLEAR";
+        clearText.font = Resources.FindObjectsOfTypeAll<Font>()[0];
+        clearText.fontSize = 60;
+        clearText.color = Color.yellow;
+        clearText.alignment = TextAnchor.MiddleCenter;
+
+        GameObject mainMenuBtnObj = CreateRect(gameClearPanel.transform, "MainMenuButton", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, -50), new Vector2(200, 50));
+        Image btnImg = mainMenuBtnObj.AddComponent<Image>();
+        btnImg.color = Color.white;
+        Button btn = mainMenuBtnObj.AddComponent<Button>();
+        
+        GameObject btnTextObj = CreateRect(mainMenuBtnObj.transform, "Text", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        Text btnText = btnTextObj.AddComponent<Text>();
+        btnText.text = "Return to Main Menu";
+        btnText.font = Resources.FindObjectsOfTypeAll<Font>()[0];
+        btnText.color = Color.black;
+        btnText.alignment = TextAnchor.MiddleCenter;
+        btnText.resizeTextForBestFit = true;
+
+        // Note: Connecting the button OnClick event in Editor script is tricky with persistent listeners.
+        // It's safer to let the User or a Runtime script handle initialization, OR use `UnityEvent.AddListener` if running in Play mode.
+        // For Editor time, we just setup the structure. The GameUIManager needs to assign the listener in Start or we do it manualy in Inspector.
+        // HOWEVER, we can try to find the method via SerializedObject if we want to be fancy, but let's keep it simple:
+        // User must assign the click event OR GameUIManager auto-wires it if possible.
+        // Actually, let's just leave the panel inactive.
+        gameClearPanel.SetActive(false);
+
+        // 6. Link to Manager
         uiManager.healthSlider = healthSlider;
         uiManager.healthFillImage = fillImg;
         uiManager.dashCooldownImage = cooldownImg;
-        
+        uiManager.gameClearPanel = gameClearPanel; // Link new panel
+
         // Create Default Gradient (Red -> Yellow -> Green)
         Gradient g = new Gradient();
         GradientColorKey[] colorKeys = new GradientColorKey[3];
@@ -111,23 +146,23 @@ public class CreateGameUI : MonoBehaviour
         
         g.SetKeys(colorKeys, alphaKeys);
         uiManager.healthColorGradient = g;
-
+        
         // Force initial color update
         fillImg.color = Color.green; // Start Green
 
-        // 6. Link Player
+        // 7. Link Player
         PlayerController player = Object.FindAnyObjectByType<PlayerController>();
         if (player)
         {
             uiManager.playerController = player;
             PlayerHealth pHealth = player.GetComponent<PlayerHealth>();
             if (pHealth == null) pHealth = player.gameObject.AddComponent<PlayerHealth>();
-
-            // Note: UnityEvents are hard to link via script persistence without SerializedObject magic,
-            // so we will rely on GameUIManager finding the player itself, 
-            // OR we update PlayerHealth to auto-find the manager if event is empty.
-            // Let's make PlayerHealth robust.
         }
+
+        // Add OnClick listener logic hint
+        Debug.LogWarning("Please manually assign 'GameUIManager.ReturnToMainMenu' to the 'Return to Main Menu' Button OnClick event!");
+
+        EditorUtility.SetDirty(uiManager); // Ensure changes are saved
 
         Selection.activeGameObject = canvasObj;
         Debug.Log("UI Created & Linked!");

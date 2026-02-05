@@ -5,6 +5,7 @@ public class EnemyHealth : MonoBehaviour
     [Header("Settings")]
     public int maxHealth = 100;
     public int currentHealth;
+    public bool isFinalBoss = false; // Add this flag
 
     [Header("Visuals")]
     public SpriteRenderer spriteRenderer;
@@ -18,10 +19,6 @@ public class EnemyHealth : MonoBehaviour
         if (spriteRenderer != null) originalColor = spriteRenderer.color;
     }
 
-    // Invincibility Logic (Unused for now)
-    // private bool isInvincible = false;
-    // public float invincibilityDuration = 0.2f;
-
     // Events for UI
     public System.Action<float> OnHealthChanged;
 
@@ -30,15 +27,6 @@ public class EnemyHealth : MonoBehaviour
     {
         // Removed passive check. Damage is now handled by DamageDealer.cs
     }
-
-    /*
-    System.Collections.IEnumerator InvincibilityRoutine()
-    {
-        isInvincible = true;
-        yield return new WaitForSeconds(invincibilityDuration);
-        isInvincible = false;
-    }
-    */
 
     public void TakeDamage(int damage)
     {
@@ -71,7 +59,27 @@ public class EnemyHealth : MonoBehaviour
     void Die()
     {
         Debug.Log("Enemy Died!");
-        // TODO: Add particle effect?
-        Destroy(gameObject);
+
+        if (isFinalBoss)
+        {
+            // Trigger Game Clear
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.ShowGameClear();
+            }
+            else
+            {
+                Debug.LogError("GameUIManager Instance not found!");
+            }
+            
+            // Optionally disable instead of destroy to keep scripts running if needed? 
+            // Or just destroy. If destroyed, this script stops running, but UI manager is separate.
+            // Let's hide the boss visually or destroy it.
+            gameObject.SetActive(false); 
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

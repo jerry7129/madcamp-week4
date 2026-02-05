@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // Required for SceneManager
 
 public class GameUIManager : MonoBehaviour
 {
+    public static GameUIManager Instance; // Singleton
+
     [Header("Health UI")]
     public Slider healthSlider;
     public Image healthFillImage;
@@ -12,11 +15,25 @@ public class GameUIManager : MonoBehaviour
     public Image dashCooldownImage; // Filled Image type
     public GameObject dashReadyEffect; // Optional flashing outline
 
-    [Header("Game Over UI")]
-    public GameObject gameOverPanel; 
+    [Header("Game Panels")]
+    public GameObject gameOverPanel;
+    public GameObject gameClearPanel; // NEW
 
     [Header("References")]
     public PlayerController playerController;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     void Start()
     {
@@ -46,8 +63,9 @@ public class GameUIManager : MonoBehaviour
             healthSlider = GetComponentInChildren<Slider>();
         }
 
-        // Ensure Game Over UI is hidden on start (re-load)
+        // Ensure Panels are hidden on start
         if (gameOverPanel) gameOverPanel.SetActive(false);
+        if (gameClearPanel) gameClearPanel.SetActive(false);
     }
 
     void Update()
@@ -87,14 +105,24 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
+    public void ShowGameClear()
+    {
+        if (gameClearPanel)
+        {
+            gameClearPanel.SetActive(true);
+            Time.timeScale = 0f; // Pause game? Optional.
+        }
+    }
+
     public void RestartGame()
     {
-        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        Time.timeScale = 1f; // Ensure time is running
+        string sceneName = SceneManager.GetActiveScene().name;
 
         // Special case for Final Stage: Reload scene to ensure full reset
         if (sceneName == "Final Stage")
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            SceneManager.LoadScene(sceneName);
             return;
         }
 
@@ -116,11 +144,17 @@ public class GameUIManager : MonoBehaviour
         else
         {
             // Fallback if controller missing: Reload Scene
-             UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+             SceneManager.LoadScene(sceneName);
              return;
         }
 
         // Hide UI
         if(gameOverPanel) gameOverPanel.SetActive(false);
+    }
+
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu"); // Make sure scene name matches exactly
     }
 }
