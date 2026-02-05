@@ -375,12 +375,13 @@ MonoBehaviour:
     m_Bits: 8
   audioSource: {fileID: 6351260578651411086}
   attackClip: {fileID: 8300000, guid: e007e54d0de23e04c9bb19f51c78b92d, type: 3}
-  skillClip: {fileID: 8300000, guid: f2f69a2afa9ce44458a805f29b251b2f, type: 3}
+  skillClip: {fileID: 8300000, guid: fdf91b62d7b0d654d9cbdbe0b68f7feb, type: 3}
   skillRange: 10
   skillCooldown: 5
   swordProjectilePrefab: {fileID: 5402029436586000523, guid: a5a04bdc1d553ba4a8d0d62fb859a888, type: 3}
   firePoint: {fileID: 8262925043125745084}
   projectilesPerAttack: 3
+  skillDamage: 10
   projectileInterval: 0.2
 --- !u!114 &8796836195413630024
 MonoBehaviour:
@@ -394,7 +395,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61013d1b1b95e5d4a915442c9cb0133f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 200
+  maxHealth: 300
   currentHealth: 0
   spriteRenderer: {fileID: 0}
   hitColor: {r: 1, g: 0, b: 0, a: 1}

@@ -11,6 +11,22 @@ public class MainMenuAudioManager : MonoBehaviour
     [Tooltip("Check this if you want the music to continue playing when the scene changes.")]
     public bool persistOnSceneLoad = true;
 
+    public static MainMenuAudioManager Instance;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            if (persistOnSceneLoad) DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
+
     void Start()
     {
         if (audioSource == null)
@@ -27,24 +43,29 @@ public class MainMenuAudioManager : MonoBehaviour
             Debug.LogWarning("MainMenuAudioManager: Menu BGM is not assigned!");
         }
 
-        // Play Menu BGM
-        if (audioSource != null && menuBGM != null)
+        // Play Menu BGM only if nothing is playing or it's the wrong clip
+        if (audioSource != null && (audioSource.clip == null || !audioSource.isPlaying))
         {
-            Debug.Log($"MainMenuAudioManager: Attempting to play {menuBGM.name}");
-            if (audioSource.clip != menuBGM)
-            {
-                audioSource.clip = menuBGM;
-                audioSource.loop = true;
-                
-                audioSource.volume = 1f;
-                audioSource.spatialBlend = 0f;
-                audioSource.mute = false;
-                audioSource.enabled = true; // Force Component on
-                audioSource.ignoreListenerPause = true; // Keep playing even if game is paused
-                
-                audioSource.Play();
-            }
+            PlayMusic(menuBGM);
         }
+    }
+
+    public void PlayMusic(AudioClip clip)
+    {
+        if (clip == null) return;
+        
+        if (audioSource.clip == clip && audioSource.isPlaying) return;
+
+        Debug.Log($"MainMenuAudioManager: Switching to {clip.name}");
+        audioSource.Stop();
+        audioSource.clip = clip;
+        audioSource.loop = true;
+        audioSource.volume = 1f;
+        audioSource.spatialBlend = 0f;
+        audioSource.mute = false;
+        audioSource.enabled = true;
+        audioSource.ignoreListenerPause = true;
+        audioSource.Play();
     }
 
     void Update()

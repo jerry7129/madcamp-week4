@@ -43,6 +43,8 @@ public class SceneTransitionTrigger : MonoBehaviour
 
     void LoadTargetScene()
     {
+        // Reset Gravity to Default (Down) before loading new scene
+        Physics2D.gravity = new Vector2(0, -9.81f);
         SceneManager.LoadScene(targetSceneName);
     }
 }

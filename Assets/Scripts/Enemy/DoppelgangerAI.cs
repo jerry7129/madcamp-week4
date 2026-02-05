@@ -344,6 +344,8 @@ public class DoppelgangerAI : MonoBehaviour
     public Transform firePoint; 
     [Tooltip("Number of projectiles per attack")]
     public int projectilesPerAttack = 3;
+    [Tooltip("Damage per projectile")]
+    public float skillDamage = 15f; // New
     [Tooltip("Delay between projectiles")]
     public float projectileInterval = 0.2f;
 
@@ -385,9 +387,8 @@ public class DoppelgangerAI : MonoBehaviour
             // Fire Projectiles
             if (swordProjectilePrefab != null)
             {
-                // Play Skill Sound ONCE at start
-                if (audioSource && skillClip) audioSource.PlayOneShot(skillClip);
-
+                // Removed single play
+                
                 for (int i = 0; i < projectilesPerAttack; i++)
                 {
                     if (animator) 
@@ -395,6 +396,10 @@ public class DoppelgangerAI : MonoBehaviour
                         animator.ResetTrigger("Attack"); // Ensure Attack doesn't play
                         animator.SetTrigger("SkillAttack"); // Trigger per projectile
                     }
+
+                    // Play Sound per Projectile
+                    if (audioSource && skillClip) audioSource.PlayOneShot(skillClip);
+
                     yield return new WaitForSeconds(0.3f); // Windup per projectile
 
                     FireProjectile();
@@ -437,6 +442,11 @@ public class DoppelgangerAI : MonoBehaviour
         else spawnPos = transform.position + (transform.right * (transform.localScale.x > 0 ? 1 : -1) * 1.0f);
 
         GameObject proj = Instantiate(swordProjectilePrefab, spawnPos, Quaternion.identity);
+        SwordProjectile sp = proj.GetComponent<SwordProjectile>();
+        if(sp)
+        {
+            sp.damage = skillDamage;
+        }
         
         // 1. Determine Target Direction
         Vector3 dir;

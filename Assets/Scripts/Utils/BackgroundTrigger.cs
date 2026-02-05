@@ -20,20 +20,45 @@ public class BackgroundTrigger : MonoBehaviour
         }
     }
 
+    private bool isTargetActive = false;
+
     public void SwitchBackground()
     {
-        if (targetGroup != null)
+        if (!isTargetActive)
         {
-            targetGroup.FadeIn();
-            Debug.Log($"Background Switched to: {targetGroup.name}");
-        }
-
-        foreach (var group in otherGroups)
-        {
-            if (group != null && group != targetGroup)
+            // Switch TO Target
+            if (targetGroup != null)
             {
-                group.FadeOut();
+                targetGroup.FadeIn();
+                Debug.Log($"Background Switched TO: {targetGroup.name}");
             }
+
+            foreach (var group in otherGroups)
+            {
+                if (group != null && group != targetGroup)
+                {
+                    group.FadeOut();
+                }
+            }
+            isTargetActive = true;
+        }
+        else
+        {
+            // Switch BACK from Target
+            if (targetGroup != null)
+            {
+                targetGroup.FadeOut();
+                Debug.Log($"Background Switched BACK from: {targetGroup.name}");
+            }
+
+            foreach (var group in otherGroups)
+            {
+                if (group != null && group != targetGroup)
+                {
+                    group.FadeIn();
+                }
+            }
+            isTargetActive = false;
         }
     }
 }
