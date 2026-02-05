@@ -89,7 +89,16 @@ public class GameUIManager : MonoBehaviour
 
     public void RestartGame()
     {
-        // Don't reload scene, just respawn player
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
+        // Special case for Final Stage: Reload scene to ensure full reset
+        if (sceneName == "Final Stage")
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            return;
+        }
+
+        // Default behavior: Don't reload scene, just respawn player
         if (playerController)
         {
             // Find Health component to trigger full respawn chain
@@ -107,7 +116,7 @@ public class GameUIManager : MonoBehaviour
         else
         {
             // Fallback if controller missing: Reload Scene
-             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+             UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
              return;
         }
 
