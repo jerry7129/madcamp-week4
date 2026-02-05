@@ -166,7 +166,7 @@ GameObject:
   - component: {fileID: 9149819894068520823}
   - component: {fileID: 4698636006881652455}
   - component: {fileID: 7844709495567149386}
-  - component: {fileID: 5187897638251802148}
+  - component: {fileID: 2533600298297863011}
   - component: {fileID: 5717669606275202350}
   - component: {fileID: 2179724814237469382}
   - component: {fileID: 8796836195413630024}
@@ -281,8 +281,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!61 &5187897638251802148
-BoxCollider2D:
+--- !u!70 &2533600298297863011
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -315,18 +315,9 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.06, y: -0.27}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2, y: 2}
-    newSize: {x: 2, y: 2}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.75, y: 1.45}
-  m_EdgeRadius: 0
+  m_Offset: {x: -0.2, y: -0.27}
+  m_Size: {x: 0.7, y: 1.5}
+  m_Direction: 0
 --- !u!95 &5717669606275202350
 Animator:
   serializedVersion: 7
@@ -383,7 +374,7 @@ MonoBehaviour:
   skillRange: 10
   skillCooldown: 5
   swordProjectilePrefab: {fileID: 5402029436586000523, guid: a5a04bdc1d553ba4a8d0d62fb859a888, type: 3}
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 8262925043125745084}
   projectilesPerAttack: 3
   projectileInterval: 0.2
 --- !u!114 &8796836195413630024

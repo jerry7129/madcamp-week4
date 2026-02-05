@@ -11,7 +11,7 @@ public class EnemyHealth : MonoBehaviour
     public Color hitColor = Color.red;
     private Color originalColor;
 
-    void Start()
+    void Awake()
     {
         currentHealth = maxHealth;
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
@@ -21,6 +21,9 @@ public class EnemyHealth : MonoBehaviour
     // Invincibility Logic
     private bool isInvincible = false;
     public float invincibilityDuration = 0.2f;
+
+    // Events for UI
+    public System.Action<float> OnHealthChanged;
 
     // Triggered when Player's Attack Collider (Trigger) touches this Enemy (Trigger usually)
     void OnTriggerEnter2D(Collider2D other)
@@ -39,6 +42,13 @@ public class EnemyHealth : MonoBehaviour
     {
         currentHealth -= damage;
         Debug.Log($"Enemy Hit! remaining HP: {currentHealth}");
+
+        // Update UI if anyone is listening
+        if (OnHealthChanged != null)
+        {
+            float ratio = (float)currentHealth / maxHealth;
+            OnHealthChanged.Invoke(ratio);
+        }
 
         // Flash Red
         if (spriteRenderer != null) StartCoroutine(FlashRoutine());

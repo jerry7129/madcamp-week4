@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     [Header("Settings")]
     public float moveSpeed = 8f;
     public float jumpHeight = 5f; // Desired height in Units (v = sqrt(2gh))
+    public float jumpCooldown = 0.2f; // Prevent double-trigger/super jump
+    private float lastJumpTime = -1f;
     public LayerMask groundLayer;
     public Transform groundCheck;
 
@@ -194,9 +196,10 @@ public class PlayerController : MonoBehaviour
                 if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) x = 1;
 
                 // Jump Input
-                if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
+                if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded && Time.time >= lastJumpTime + jumpCooldown)
                 {
                     Jump();
+                    lastJumpTime = Time.time;
                 }
 
                 // --- SIXFOLD CHARGE LOGIC (Key: C) ---
@@ -399,10 +402,8 @@ public class PlayerController : MonoBehaviour
         // 1. Standard Circle Check (Flat ground)
         if (groundCheck != null)
         {
-            // Debug Visualization
-            // Debug.DrawWireSphere is not valid. Use Gizmos in OnDrawGizmos.
-            
-            bool circleHit = Physics2D.OverlapCircle(groundCheck.position, 0.4f, groundLayer);
+            // Reduced radius from 0.4f to 0.15f to prevent detecting walls as ground
+            bool circleHit = Physics2D.OverlapCircle(groundCheck.position, 0.15f, groundLayer);
             if (circleHit) 
             {
                 isGrounded = true;

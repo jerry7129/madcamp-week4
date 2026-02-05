@@ -15,6 +15,8 @@ public class DoppelgangerAI : MonoBehaviour
     [Range(0f, 5f)] public float downwardMovementMultiplier = 3f;
     [Range(0f, 5f)] public float upwardMovementMultiplier = 1.7f;
     public float jumpHeight = 3.0f;
+    public float jumpCooldown = 0.2f; // New
+    private float lastJumpTime = -1f;
 
     [Header("References")]
     public Transform target;
@@ -183,7 +185,7 @@ public class DoppelgangerAI : MonoBehaviour
         if (groundCheck == null) return;
 
         // 1. Circle Check
-        bool circleHit = Physics2D.OverlapCircle(groundCheck.position, 0.4f, groundLayer);
+        bool circleHit = Physics2D.OverlapCircle(groundCheck.position, 0.15f, groundLayer); // Reduced radius
         if (circleHit) isGrounded = true;
 
         // 2. Slope Raycast
@@ -316,9 +318,10 @@ public class DoppelgangerAI : MonoBehaviour
         
         float relativeHeight = Vector2.Dot(target.position - transform.position, -gDir);
         
-        if (isGrounded && relativeHeight > 1.5f && Mathf.Abs(moveInputX) > 0.1f)
+        if (isGrounded && relativeHeight > 1.5f && Mathf.Abs(moveInputX) > 0.1f && Time.time >= lastJumpTime + jumpCooldown)
         {
              // Jump!
+             lastJumpTime = Time.time;
              float gMag = Physics2D.gravity.magnitude * defaultGravityScale;
              float jumpVel = Mathf.Sqrt(2 * gMag * jumpHeight); // v = sqrt(2gh)
              
@@ -463,7 +466,7 @@ public class DoppelgangerAI : MonoBehaviour
         if (groundCheck != null)
         {
             Gizmos.color = isGrounded ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(groundCheck.position, 0.4f);
+            Gizmos.DrawWireSphere(groundCheck.position, 0.15f);
         }
     }
 }

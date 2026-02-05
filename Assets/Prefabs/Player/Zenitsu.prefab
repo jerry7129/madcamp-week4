@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2486257073085163160}
   - component: {fileID: 5723939376419208061}
   - component: {fileID: 1936183696850026229}
-  - component: {fileID: 7880580698423980321}
+  - component: {fileID: 1987295748732710648}
   - component: {fileID: 1029971840193803396}
   m_Layer: 8
   m_Name: Zenitsu
@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 8
-  jumpHeight: 5
+  jumpHeight: 6
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -183,8 +183,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!61 &7880580698423980321
-BoxCollider2D:
+--- !u!70 &1987295748732710648
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -217,18 +217,9 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.06, y: -0.27}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2, y: 2}
-    newSize: {x: 0.26, y: 0.48}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.75, y: 1.45}
-  m_EdgeRadius: 0
+  m_Offset: {x: -0.2, y: -0.26}
+  m_Size: {x: 0.9, y: 1.5}
+  m_Direction: 0
 --- !u!95 &1029971840193803396
 Animator:
   serializedVersion: 7

@@ -21,6 +21,8 @@ public class GravityBoundEnemyAI : MonoBehaviour
     public float downwardMovementMultiplier = 3f;
     public float upwardMovementMultiplier = 1.7f;
     public float jumpHeight = 3.0f;
+    public float jumpCooldown = 0.2f; // New
+    private float lastJumpTime = -1f;
 
     [Header("References")]
     public Transform target;
@@ -157,7 +159,7 @@ public class GravityBoundEnemyAI : MonoBehaviour
 
         if (groundCheck == null) return;
 
-        if (Physics2D.OverlapCircle(groundCheck.position, 0.4f, groundLayer)) isGrounded = true;
+        if (Physics2D.OverlapCircle(groundCheck.position, 0.15f, groundLayer)) isGrounded = true;
 
         Vector2 rayDir = localGravityDirection.normalized;
         RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, rayDir, 0.6f, groundLayer);
@@ -191,7 +193,7 @@ public class GravityBoundEnemyAI : MonoBehaviour
             float relativeH = Vector2.Dot(target.position - transform.position, transform.up);
 
             // Condition: Grounded, Close enough, Target is higher, Moving
-            if (isGrounded && dist <= detectRange && relativeH > 1.5f && Mathf.Abs(moveInputX) > 0)
+            if (isGrounded && dist <= detectRange && relativeH > 1.5f && Mathf.Abs(moveInputX) > 0 && Time.time >= lastJumpTime + jumpCooldown)
             {
                  // 5% chance per frame to jump
                  if (Random.value < 0.05f) 
@@ -289,6 +291,7 @@ public class GravityBoundEnemyAI : MonoBehaviour
 
     void Jump()
     {
+        lastJumpTime = Time.time;
         Vector2 jumpDir = -localGravityDirection.normalized;
         float jumpVel = Mathf.Sqrt(2f * gravityMagnitude * jumpHeight);
         
