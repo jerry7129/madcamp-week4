@@ -377,15 +377,19 @@ public class DoppelgangerAI : MonoBehaviour
         {
             // --- SKILL ATTACK (Projectiles) ---
             lastSkillTime = Time.time;
-            if(animator) animator.SetTrigger("SkillAttack"); // New Trigger
             
-            yield return new WaitForSeconds(0.3f); // Windup for Skill
-
             // Fire Projectiles
             if (swordProjectilePrefab != null)
             {
                 for (int i = 0; i < projectilesPerAttack; i++)
                 {
+                    if (animator) 
+                    {
+                        animator.ResetTrigger("Attack"); // Ensure Attack doesn't play
+                        animator.SetTrigger("SkillAttack"); // Trigger per projectile
+                    }
+                    yield return new WaitForSeconds(0.3f); // Windup per projectile
+
                     FireProjectile();
                     yield return new WaitForSeconds(projectileInterval);
                 }
